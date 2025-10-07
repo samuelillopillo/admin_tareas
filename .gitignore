@@ -11,3 +11,5 @@ env/
 
 # Archivos de entorno (si los usas para secrets)
 .env
+
+.idea/
