@@ -8,6 +8,8 @@ from django.contrib.auth import login
 from django.urls import reverse_lazy
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from .forms import TareaForm
+from datetime import date
 
 
 class Logueo(LoginView):
@@ -50,6 +52,10 @@ class ListaPendientes(LoginRequiredMixin, ListView):
         if valor_buscado:
             context['tareas'] = context['tareas'].filter(titulo__icontains=valor_buscado)
             context['valor_buscado'] = valor_buscado
+
+        for tarea in context['tareas']:
+            if tarea.fecha_vencimiento and tarea.fecha_vencimiento < date.today() and not tarea.completo:
+                tarea.vencida = True
         return context
 
 
@@ -64,7 +70,7 @@ class DetalleTarea(LoginRequiredMixin, DetailView):
 
 class CrearTarea(LoginRequiredMixin, CreateView):
     model = Tarea
-    fields = ['titulo', 'descripcion', 'completo']
+    form_class = TareaForm
     success_url = reverse_lazy('tareas')
 
     def form_valid(self, form):
@@ -75,7 +81,7 @@ class CrearTarea(LoginRequiredMixin, CreateView):
 
 class EditarTarea(LoginRequiredMixin, UpdateView):
     model = Tarea
-    fields = ['titulo', 'descripcion', 'completo']
+    form_class = TareaForm
     success_url = reverse_lazy('tareas')
 
 
